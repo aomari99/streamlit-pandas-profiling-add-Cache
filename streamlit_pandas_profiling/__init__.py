@@ -11,6 +11,20 @@ else:
 
 _render_component = declare_component("streamlit_pandas_profiling", **_source)
 
+@st.experimental_memo
+def __setup_st_profile_report(report,config)
+    
+
+    try:
+        report.set_variable("html", config)
+    except AttributeError:
+        # Since Pandas Profiling 3.0.0
+        report.config.html.inline = config["inline"]
+        report.config.html.minify_html = config["minify_html"]
+        report.config.html.use_local_assets = config["use_local_assets"]
+        report.config.html.navbar_show = config["navbar_show"]
+        report.config.html.full_width = config["style"]["full_width"]
+    return report.to_html()
 
 def st_profile_report(report, height=None, navbar=True, key=None):
     """Display a profile report.
@@ -40,15 +54,5 @@ def st_profile_report(report, height=None, navbar=True, key=None):
         }
     }
 
-    try:
-        report.set_variable("html", config)
-    except AttributeError:
-        # Since Pandas Profiling 3.0.0
-        report.config.html.inline = config["inline"]
-        report.config.html.minify_html = config["minify_html"]
-        report.config.html.use_local_assets = config["use_local_assets"]
-        report.config.html.navbar_show = config["navbar_show"]
-        report.config.html.full_width = config["style"]["full_width"]
-
     with st.spinner("Generating profile report..."):
-        _render_component(html=report.to_html(), height=height, key=key, default=None)
+        _render_component(html=__setup_st_profile_report(report,config), height=height, key=key, default=None)
